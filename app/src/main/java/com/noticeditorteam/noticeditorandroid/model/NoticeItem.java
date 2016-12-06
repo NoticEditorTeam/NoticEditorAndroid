@@ -6,6 +6,7 @@ public class NoticeItem {
 
     private String title;
     private String content;
+
     private ArrayList<NoticeItem> children;
 
     public NoticeItem(String title) {
@@ -29,6 +30,12 @@ public class NoticeItem {
     public boolean isBranch() {
         return content == null;
     }
+
+    public String getTitle() { return title; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public ArrayList<NoticeItem> getChildren() { return children; }
 
     public String getContent() {
         return content;
