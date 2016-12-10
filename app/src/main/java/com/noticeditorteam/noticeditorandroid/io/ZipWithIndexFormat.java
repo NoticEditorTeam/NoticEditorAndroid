@@ -84,6 +84,7 @@ public class ZipWithIndexFormat {
             // ../note_filename/filename.md
             final String mdPath = newDir + filename + ".md";
             final NoticeItem item = new NoticeItem(title, readFile(mdPath));
+            item.setPath(newDir);
             return item;
         }
     }

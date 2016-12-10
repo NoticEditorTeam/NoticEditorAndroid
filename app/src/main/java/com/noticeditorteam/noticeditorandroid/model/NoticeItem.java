@@ -1,11 +1,43 @@
 package com.noticeditorteam.noticeditorandroid.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class NoticeItem {
+public class NoticeItem implements Parcelable {
 
     private String title;
     private String content;
+
+    protected NoticeItem(Parcel in) {
+        title = in.readString();
+        content = in.readString();
+        path = in.readString();
+        children = in.createTypedArrayList(NoticeItem.CREATOR);
+    }
+
+    public static final Creator<NoticeItem> CREATOR = new Creator<NoticeItem>() {
+        @Override
+        public NoticeItem createFromParcel(Parcel in) {
+            return new NoticeItem(in);
+        }
+
+        @Override
+        public NoticeItem[] newArray(int size) {
+            return new NoticeItem[size];
+        }
+    };
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    private String path;
 
     private ArrayList<NoticeItem> children;
 
@@ -49,7 +81,19 @@ public class NoticeItem {
 
     @Override
     public String toString() {
-        return title + "\n\n" + content;
+        return title;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(content);
+        dest.writeString(path);
+        dest.writeTypedList(children);
+    }
 }
