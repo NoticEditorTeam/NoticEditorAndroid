@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-            switch(id) {
+        switch (id) {
             case R.id.newitem:
                 Intent intent = new Intent(this, NoticeTreeActivity.class);
                 intent.putExtra("tree", new NoticeItem("root"));
@@ -62,15 +62,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == FILE_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == FILE_CODE && resultCode == Activity.RESULT_OK) {
             Uri uri = data.getData();
             File notice = new File(uri.getPath());
             try {
                 NoticeItem item = DocumentFormat.open(notice);
                 Intent intent = new Intent(this, NoticeTreeActivity.class);
                 intent.putExtra("tree", item);
+                intent.putExtra("file", uri.getPath());
                 startActivity(intent);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -17,21 +17,20 @@ public class NoticeTreeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notice_tree);
         NoticeItem tree = getIntent().getParcelableExtra("tree");
+        String path = getIntent().getStringExtra("file");
         ListView list = (ListView) findViewById(R.id.noticeview);
         ArrayAdapter<NoticeItem> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tree.getChildren());
         list.setAdapter(adapter);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
             NoticeItem newitem = (NoticeItem)adapter.getItem(position);
-            if(newitem.isBranch()) {
-                Intent intent = new Intent(this, NoticeTreeActivity.class);
-                intent.putExtra("tree", newitem);
-                startActivity(intent);
-            }
-            else {
-                Intent intent = new Intent(this, EditNoticeActivity.class);
-                intent.putExtra("content", newitem.getContent());
-                startActivity(intent);
-            }
+            Intent intent;
+            if(newitem.isBranch())
+                intent = new Intent(this, NoticeTreeActivity.class);
+            else
+                intent = new Intent(this, EditNoticeActivity.class);
+            intent.putExtra("tree", newitem);
+            intent.putExtra("file", path);
+            startActivity(intent);
         });
     }
 }

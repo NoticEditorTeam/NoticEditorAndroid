@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Предпросмотр"
+        android:id="@+id/viewitem" />
+    <item android:title="Сохранить"
+        android:id="@+id/saveitem" />
+</menu>
