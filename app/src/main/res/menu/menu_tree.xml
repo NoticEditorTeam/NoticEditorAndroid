@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="New branch"
+        android:id="@+id/newbranchitem" />
+    <item android:title="New notice"
+        android:id="@+id/newnoticeitem" />
+    <item android:title="Save notice"
+        android:id="@+id/saveitem" />
+    <item android:title="Save notice as"
+        android:id="@+id/saveasitem" />
+</menu>

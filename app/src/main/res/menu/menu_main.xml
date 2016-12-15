@@ -2,10 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.noticeditorteam.noticeditorandroid.MainActivity">
-    <item android:title="Новая заметка"
+    <item android:title="New notice"
         android:id="@+id/newitem" />
-    <item android:title="Открыть"
+    <item android:title="Open notice"
         android:id="@+id/openitem" />
-    <item android:title="Недавние"
-        android:id="@+id/recentitem" />
 </menu>

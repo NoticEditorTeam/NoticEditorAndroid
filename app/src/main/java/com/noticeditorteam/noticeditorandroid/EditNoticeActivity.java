@@ -1,5 +1,6 @@
 package com.noticeditorteam.noticeditorandroid;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +18,7 @@ import java.io.File;
 public class EditNoticeActivity extends AppCompatActivity {
 
     private String path;
+    private NoticeItem notice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,7 @@ public class EditNoticeActivity extends AppCompatActivity {
         path = getIntent().getStringExtra("file");
         EditText noticeText = (EditText)findViewById(R.id.editNotice);
         noticeText.setText(notice.getContent());
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.editToolbar);
         setSupportActionBar(toolbar);
     }
 
@@ -39,17 +41,22 @@ public class EditNoticeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        notice = getIntent().getParcelableExtra("tree");
         switch(id) {
             case R.id.viewitem:
-                break;
-            case R.id.saveitem:
-                NoticeItem notice = getIntent().getParcelableExtra("tree");
-                EditText noticeText = (EditText)findViewById(R.id.editNotice);
-                notice.changeContent(noticeText.getText().toString());
-                File file = new File(path);
-                DocumentFormat.save(notice, file, ExportStrategyHolder.ZIP);
+                Intent intent = new Intent(this, ViewNoticeActivity.class);
+                intent.putExtra("content", notice.getContent());
+                startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = getIntent();
+        returnIntent.putExtra("tree", notice);
+        setResult(1, returnIntent);
+        super.onBackPressed();
     }
 }
