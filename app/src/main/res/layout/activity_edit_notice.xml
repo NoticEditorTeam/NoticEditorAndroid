@@ -24,9 +24,9 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:inputType="textMultiLine"
-        android:ems="10"
+        android:gravity="top|start"
         android:id="@+id/editNotice"
         android:layout_weight="1" />
 
