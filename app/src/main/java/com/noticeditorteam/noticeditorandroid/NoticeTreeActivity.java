@@ -51,7 +51,7 @@ public class NoticeTreeActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
-        Toolbar toolbar = (Toolbar) findViewById(R.id.treeToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 

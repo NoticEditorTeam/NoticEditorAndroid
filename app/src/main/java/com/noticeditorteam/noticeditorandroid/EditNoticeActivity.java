@@ -28,7 +28,7 @@ public class EditNoticeActivity extends AppCompatActivity {
         path = getIntent().getStringExtra("file");
         EditText noticeText = (EditText)findViewById(R.id.editNotice);
         noticeText.setText(notice.getContent());
-        Toolbar toolbar = (Toolbar) findViewById(R.id.editToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 

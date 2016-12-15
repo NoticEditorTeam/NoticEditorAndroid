@@ -18,7 +18,7 @@ public class ViewNoticeActivity extends AppCompatActivity {
         MarkdownView view = (MarkdownView) findViewById(R.id.markdownView);
         String content = getIntent().getStringExtra("content");
         view.loadMarkdown(content);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.viewToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
