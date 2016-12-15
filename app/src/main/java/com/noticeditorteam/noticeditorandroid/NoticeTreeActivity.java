@@ -17,6 +17,7 @@ import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class NoticeTreeActivity extends AppCompatActivity {
 
@@ -34,14 +35,14 @@ public class NoticeTreeActivity extends AppCompatActivity {
         if(pathlist.isEmpty()) pathlist.addLast(current);
         path = getIntent().getStringExtra("file");
         ListView list = (ListView) findViewById(R.id.noticeview);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, current.getChildren());
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(current.getChildren()));
         list.setAdapter(adapter);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
             current = (NoticeItem)adapter.getItem(position);
             if(current.isBranch()) {
                 pathlist.addLast(current);
                 adapter.clear();
-                adapter.addAll(current.getChildren());
+                adapter.addAll(new ArrayList<>(current.getChildren()));
                 adapter.notifyDataSetChanged();
             }
             else {
@@ -86,8 +87,7 @@ public class NoticeTreeActivity extends AppCompatActivity {
             if(last.equals(current)) pathlist.removeLast();
             current = pathlist.getLast();
             adapter.clear();
-            adapter.addAll(current.getChildren());
-            adapter.notifyDataSetChanged();
+            adapter.addAll(new ArrayList<>(current.getChildren()));
         }
         else finish();
     }
