@@ -19,14 +19,15 @@ public class EditNoticeActivity extends AppCompatActivity {
 
     private String path;
     private NoticeItem notice;
+    private EditText noticeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_notice);
-        NoticeItem notice = getIntent().getParcelableExtra("tree");
+        notice = getIntent().getParcelableExtra("tree");
         path = getIntent().getStringExtra("file");
-        EditText noticeText = (EditText)findViewById(R.id.editNotice);
+        noticeText = (EditText)findViewById(R.id.editNotice);
         noticeText.setText(notice.getContent());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -41,11 +42,10 @@ public class EditNoticeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        notice = getIntent().getParcelableExtra("tree");
         switch(id) {
             case R.id.viewitem:
                 Intent intent = new Intent(this, ViewNoticeActivity.class);
-                intent.putExtra("content", notice.getContent());
+                intent.putExtra("content", noticeText.getText().toString());
                 startActivity(intent);
                 break;
         }
@@ -54,7 +54,8 @@ public class EditNoticeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent returnIntent = getIntent();
+        notice.changeContent(noticeText.getText().toString());
+        Intent returnIntent = new Intent(this, NoticeTreeActivity.class);
         returnIntent.putExtra("tree", notice);
         setResult(1, returnIntent);
         super.onBackPressed();
