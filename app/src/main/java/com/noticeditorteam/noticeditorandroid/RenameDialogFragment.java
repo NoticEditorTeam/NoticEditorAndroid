@@ -9,12 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
-
 public class RenameDialogFragment extends DialogFragment {
 
     public interface RenameDialogListener {
-        public void onDialogPositiveClick(RenameDialogFragment dialog);
+        void onDialogPositiveClick(RenameDialogFragment dialog);
     }
 
     public EditText getNoticeName() {
@@ -41,9 +39,8 @@ public class RenameDialogFragment extends DialogFragment {
         Bundle args = getArguments();
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View mView = inflater.inflate(R.layout.dialog_rename, null);
-        NoticeItem tree = args.getParcelable("tree");
         noticeName = (EditText) mView.findViewById(R.id.newname);
-        noticeName.setText(tree.getTitle());
+        noticeName.setText(args.getString("name"));
         builder.setView(mView)
             .setPositiveButton("OK", (dialog, which) -> {
                 mListener.onDialogPositiveClick(RenameDialogFragment.this);

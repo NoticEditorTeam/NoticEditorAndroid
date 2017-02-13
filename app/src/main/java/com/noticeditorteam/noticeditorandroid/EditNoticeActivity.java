@@ -1,19 +1,14 @@
 package com.noticeditorteam.noticeditorandroid;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import com.noticeditorteam.noticeditorandroid.io.DocumentFormat;
-import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategy;
-import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategyHolder;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
-
-import java.io.File;
 
 public class EditNoticeActivity extends AppCompatActivity {
 

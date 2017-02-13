@@ -1,14 +1,26 @@
 package com.noticeditorteam.noticeditorandroid.io;
 
-import gcardone.junidecode.Junidecode;
-import java.io.*;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import gcardone.junidecode.Junidecode;
 
 public final class IOUtil {
 

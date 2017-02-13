@@ -2,9 +2,9 @@ package com.noticeditorteam.noticeditorandroid;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -37,12 +37,11 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notice_tree);
-        NoticeItem tree = getIntent().getParcelableExtra("tree");
-        current = tree;
+        current = getIntent().getParcelableExtra("tree");
         if(pathlist.isEmpty()) pathlist.addLast(current);
         path = getIntent().getStringExtra("file");
         ListView list = (ListView) findViewById(R.id.noticeview);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, current.getChildren());
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(current.getChildren()));
         list.setAdapter(adapter);
         list.setLongClickable(true);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
@@ -50,7 +49,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
             if(current.isBranch()) {
                 pathlist.addLast(current);
                 adapter.clear();
-                adapter.addAll(current.getChildren());
+                adapter.addAll(new ArrayList<>(current.getChildren()));
                 adapter.notifyDataSetChanged();
             }
             else {
@@ -120,7 +119,8 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
             case R.id.renameitem:
                 DialogFragment fragment = new RenameDialogFragment();
                 Bundle args = new Bundle();
-                args.putParcelable("tree", changingItem);
+                args.putInt("position", info.position);
+                args.putString("name", changingItem.getTitle());
                 fragment.setArguments(args);
                 fragment.show(getFragmentManager(), "missiles");
                 break;
@@ -149,7 +149,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
             if(last.equals(current)) pathlist.removeLast();
             current = pathlist.getLast();
             adapter.clear();
-            adapter.addAll(current.getChildren());
+            adapter.addAll(new ArrayList<>(current.getChildren()));
             adapter.notifyDataSetChanged();
         }
         else finish();
@@ -180,12 +180,12 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
     @Override
     public void onDialogPositiveClick(RenameDialogFragment dialog) {
         Bundle args = dialog.getArguments();
-        NoticeItem renamingItem = args.getParcelable("tree");
+        NoticeItem renamingItem = adapter.getItem(args.getInt("position"));
         int ind = current.getChildren().indexOf(renamingItem);
         renamingItem.setTitle(dialog.getNoticeName().getText().toString());
         current.getChildren().set(ind, renamingItem);
         adapter.clear();
-        adapter.addAll(current.getChildren());
+        adapter.addAll(new ArrayList<>(current.getChildren()));
         adapter.notifyDataSetChanged();
     }
 }
