@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@android:style/Theme.Black.NoTitleBar"
-    tools:context="com.noticeditorteam.noticeditorandroid.EditNoticeActivity">
+    tools:context="com.noticeditorteam.noticeditorandroid.EditNoticeActivity"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:expanded="false"
+        android:theme="@style/AppTheme.NoActionBar"
+        android:fitsSystemWindows="true">
+
+        <include
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.design.widget.AppBarLayout>
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:inputType="textMultiLine"
-        android:ems="10"
+        android:gravity="top|start"
         android:id="@+id/editNotice"
-        android:layout_weight="1"
-        android:hint="Write down your notice" />
+        android:layout_weight="1" />
 
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

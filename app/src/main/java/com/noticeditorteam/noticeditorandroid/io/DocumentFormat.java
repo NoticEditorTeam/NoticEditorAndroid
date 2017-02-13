@@ -1,5 +1,6 @@
 package com.noticeditorteam.noticeditorandroid.io;
 
+import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategy;
 import com.noticeditorteam.noticeditorandroid.io.importers.FileImporter;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
@@ -22,5 +23,9 @@ public class DocumentFormat {
         } catch (ZipException | IOException | JSONException e){
             return FileImporter.Tree.importFrom(file);
         }
+    }
+
+    public static boolean save(NoticeItem tree, File file, ExportStrategy strategy) {
+        return strategy.export(file, tree);
     }
 }

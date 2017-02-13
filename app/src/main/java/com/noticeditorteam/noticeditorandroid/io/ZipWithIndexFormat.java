@@ -1,18 +1,25 @@
 package com.noticeditorteam.noticeditorandroid.io;
 
-import com.noticeditorteam.noticeditorandroid.model.*;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
+
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ZipWithIndexFormat {
 
