@@ -1,11 +1,12 @@
 package com.noticeditorteam.noticeditorandroid;
 
+import android.app.DialogFragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +16,6 @@ import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.noticeditorteam.noticeditorandroid.io.DocumentFormat;
-import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategy;
 import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategyHolder;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-public class NoticeTreeActivity extends AppCompatActivity {
+public class NoticeTreeActivity extends AppCompatActivity implements RenameDialogFragment.RenameDialogListener {
 
     private final int EDIT_NOTICE_REQUEST = 1;
     private final int SELECT_FILE_REQUEST = 2;
@@ -42,14 +42,15 @@ public class NoticeTreeActivity extends AppCompatActivity {
         if(pathlist.isEmpty()) pathlist.addLast(current);
         path = getIntent().getStringExtra("file");
         ListView list = (ListView) findViewById(R.id.noticeview);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(current.getChildren()));
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, current.getChildren());
         list.setAdapter(adapter);
+        list.setLongClickable(true);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
-            current = (NoticeItem)adapter.getItem(position);
+            current = adapter.getItem(position);
             if(current.isBranch()) {
                 pathlist.addLast(current);
                 adapter.clear();
-                adapter.addAll(new ArrayList<>(current.getChildren()));
+                adapter.addAll(current.getChildren());
                 adapter.notifyDataSetChanged();
             }
             else {
@@ -59,6 +60,7 @@ public class NoticeTreeActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
+        registerForContextMenu(list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
@@ -102,7 +104,36 @@ public class NoticeTreeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showSaveDialog() {
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if(v.getId() == R.id.noticeview)
+            getMenuInflater().inflate(R.menu.context_menu_bnotice, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        NoticeItem changingItem = adapter.getItem(info.position);
+        switch (id) {
+            case R.id.renameitem:
+                DialogFragment fragment = new RenameDialogFragment();
+                Bundle args = new Bundle();
+                args.putParcelable("tree", changingItem);
+                fragment.setArguments(args);
+                fragment.show(getFragmentManager(), "missiles");
+                break;
+            case R.id.deletebnoticeitem:
+                current.getChildren().remove(changingItem);
+                adapter.remove(changingItem);
+                adapter.notifyDataSetChanged();
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    private void showSaveDialog() {
         Intent intent = new Intent(this, FilePickerActivity.class);
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
@@ -118,7 +149,8 @@ public class NoticeTreeActivity extends AppCompatActivity {
             if(last.equals(current)) pathlist.removeLast();
             current = pathlist.getLast();
             adapter.clear();
-            adapter.addAll(new ArrayList<>(current.getChildren()));
+            adapter.addAll(current.getChildren());
+            adapter.notifyDataSetChanged();
         }
         else finish();
     }
@@ -131,8 +163,7 @@ public class NoticeTreeActivity extends AppCompatActivity {
                 current = pathlist.getLast();
                 NoticeItem notice = data.getParcelableExtra("tree");
                 int ind = current.getChildren().indexOf(oldcurrent);
-                current.getChildren().remove(oldcurrent);
-                current.getChildren().add(ind, notice);
+                current.getChildren().set(ind, notice);
                 break;
             case SELECT_FILE_REQUEST:
                 try {
@@ -144,5 +175,17 @@ public class NoticeTreeActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onDialogPositiveClick(RenameDialogFragment dialog) {
+        Bundle args = dialog.getArguments();
+        NoticeItem renamingItem = args.getParcelable("tree");
+        int ind = current.getChildren().indexOf(renamingItem);
+        renamingItem.setTitle(dialog.getNoticeName().getText().toString());
+        current.getChildren().set(ind, renamingItem);
+        adapter.clear();
+        adapter.addAll(current.getChildren());
+        adapter.notifyDataSetChanged();
     }
 }
