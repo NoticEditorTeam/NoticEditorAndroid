@@ -1,2 +1,2 @@
 # NoticEditorAndroid
-A port NoticEditor for Android
+NoticEditor port for Android
