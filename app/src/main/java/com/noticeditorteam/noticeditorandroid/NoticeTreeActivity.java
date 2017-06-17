@@ -164,6 +164,9 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
                 NoticeItem notice = data.getParcelableExtra("tree");
                 int ind = current.getChildren().indexOf(oldcurrent);
                 current.getChildren().set(ind, notice);
+                adapter.clear();
+                adapter.addAll(new ArrayList<>(current.getChildren()));
+                adapter.notifyDataSetChanged();
                 break;
             case SELECT_FILE_REQUEST:
                 try {
