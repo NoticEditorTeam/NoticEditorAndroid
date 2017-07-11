@@ -1,4 +1,4 @@
-package com.noticeditorteam.noticeditorandroid;
+package com.noticeditorteam.noticeditorandroid.activities;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -9,6 +9,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.noticeditorteam.noticeditorandroid.fragments.EditNoticeFragment;
+import com.noticeditorteam.noticeditorandroid.fragments.PreviewNoticeFragment;
+import com.noticeditorteam.noticeditorandroid.R;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
 public class NoticeWorkActivity extends AppCompatActivity {
@@ -18,8 +21,6 @@ public class NoticeWorkActivity extends AppCompatActivity {
     private static final String RESULT_TREE = "tree";
 
     private NoticeItem notice;
-    private ViewPager pager;
-    private PagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +28,8 @@ public class NoticeWorkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notice_work);
         notice = getIntent().getParcelableExtra(ARG_TREE);
         if(savedInstanceState != null) notice = savedInstanceState.getParcelable(ARG_TREE);
-        pager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        PagerAdapter pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
     }
 
@@ -48,7 +49,7 @@ public class NoticeWorkActivity extends AppCompatActivity {
 
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
-        public MyFragmentPagerAdapter(FragmentManager fm) {
+        MyFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

@@ -1,15 +1,20 @@
-package com.noticeditorteam.noticeditorandroid;
+package com.noticeditorteam.noticeditorandroid.fragments;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.noticeditorteam.noticeditorandroid.R;
+
 public class RenameDialogFragment extends DialogFragment {
+
+    private static final String ARG_NAME = "name";
 
     public interface RenameDialogListener {
         void onDialogPositiveClick(RenameDialogFragment dialog);
@@ -23,12 +28,12 @@ public class RenameDialogFragment extends DialogFragment {
     private RenameDialogListener mListener;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (RenameDialogListener) activity;
+            mListener = (RenameDialogListener) context;
         } catch(ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement RenameDialogListener");
+            throw new ClassCastException(context.toString() + " must implement RenameDialogListener");
         }
     }
 
@@ -38,16 +43,12 @@ public class RenameDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View mView = inflater.inflate(R.layout.dialog_rename, null);
+        @SuppressLint("InflateParams") View mView = inflater.inflate(R.layout.dialog_rename, null);
         noticeName = (EditText) mView.findViewById(R.id.newname);
-        noticeName.setText(args.getString("name"));
+        noticeName.setText(args.getString(ARG_NAME));
         builder.setView(mView)
-            .setPositiveButton("OK", (dialog, which) -> {
-                mListener.onDialogPositiveClick(RenameDialogFragment.this);
-            })
-            .setNegativeButton("Cancel", (dialog, which) -> {
-                RenameDialogFragment.this.getDialog().cancel();
-            });
+            .setPositiveButton("OK", (dialog, which) -> mListener.onDialogPositiveClick(RenameDialogFragment.this))
+            .setNegativeButton("Cancel", (dialog, which) -> RenameDialogFragment.this.getDialog().cancel());
         return builder.create();
     }
 }

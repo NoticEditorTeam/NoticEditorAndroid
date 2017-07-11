@@ -1,8 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.noticeditorteam.noticeditorandroid.MainActivity">
-    <item android:title="New notice"
+    tools:context="com.noticeditorteam.noticeditorandroid.activities.MainActivity">
+    <item android:title="@string/new_notice"
         android:id="@+id/newitem" />
-    <item android:title="Open notice"
+    <item android:title="@string/open_notice"
         android:id="@+id/openitem" />
 </menu>

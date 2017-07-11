@@ -1,4 +1,4 @@
-package com.noticeditorteam.noticeditorandroid;
+package com.noticeditorteam.noticeditorandroid.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -17,18 +16,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.noticeditorteam.noticeditorandroid.R;
 import com.noticeditorteam.noticeditorandroid.io.DocumentFormat;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String RES_RECENT = "recentnotes";
+    private static final String SAVE_RECENT = "recentnotes";
+    private static final String ROOT_BRANCH_TITLE = "root";
+    private static final String ARG_NOTICE = "tree";
+    private static final String ARG_FILE = "file";
 
     private int FILE_CODE = 0;
 
@@ -40,15 +43,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         recentFiles.clear();
-        recentFiles.addAll(preferences.getStringSet("recentnotes", new HashSet<>()));
+        recentFiles.addAll(preferences.getStringSet(RES_RECENT, new HashSet<>()));
+        if(savedInstanceState != null) {
+            recentFiles = savedInstanceState.getStringArrayList(SAVE_RECENT);
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ListView list = (ListView) findViewById(R.id.recentview);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recentFiles);
         list.setAdapter(adapter);
-        list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
-            openDocument(adapter.getItem(position));
-        });
+        list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id)
+                -> openDocument(adapter.getItem(position)));
         setSupportActionBar(toolbar);
     }
 
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
             case R.id.newitem:
                 Intent intent = new Intent(this, NoticeTreeActivity.class);
-                intent.putExtra("tree", new NoticeItem("root"));
+                intent.putExtra(ARG_NOTICE, new NoticeItem(ROOT_BRANCH_TITLE));
                 startActivity(intent);
                 break;
             case R.id.openitem:
@@ -88,11 +93,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList(SAVE_RECENT, recentFiles);
+    }
+
+    @Override
     protected void onDestroy() {
         Set<String> set = new HashSet<>();
         set.addAll(recentFiles);
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
-        editor.putStringSet("recentnotes", set);
+        editor.putStringSet(RES_RECENT, set);
         editor.apply();
         super.onDestroy();
     }
@@ -106,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
             adapter.remove(path);
             adapter.add(path);
             Intent intent = new Intent(this, NoticeTreeActivity.class);
-            intent.putExtra("tree", item);
-            intent.putExtra("file", path);
+            intent.putExtra(ARG_NOTICE, item);
+            intent.putExtra(ARG_FILE, path);
             startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();

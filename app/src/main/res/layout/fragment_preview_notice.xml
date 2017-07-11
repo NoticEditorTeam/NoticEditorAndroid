@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.noticeditorteam.noticeditorandroid.PreviewNoticeFragment">
+    tools:context="com.noticeditorteam.noticeditorandroid.fragments.PreviewNoticeFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <us.feras.mdv.MarkdownView
