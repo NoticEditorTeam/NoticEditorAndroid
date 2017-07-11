@@ -3,18 +3,27 @@ package com.noticeditorteam.noticeditorandroid.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.noticeditorteam.noticeditorandroid.NoticeListener;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NoticeItem implements Parcelable {
 
     private String title;
     private String content;
 
+    protected Set<NoticeListener> listeners;
+
     protected NoticeItem(Parcel in) {
         title = in.readString();
         content = in.readString();
         path = in.readString();
         children = in.createTypedArrayList(NoticeItem.CREATOR);
+        listeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
     public static final Creator<NoticeItem> CREATOR = new Creator<NoticeItem>() {
@@ -49,6 +58,7 @@ public class NoticeItem implements Parcelable {
         this.title = title;
         this.content = content;
         children = new ArrayList();
+        listeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
     public void addChild(NoticeItem item) {
@@ -65,7 +75,10 @@ public class NoticeItem implements Parcelable {
 
     public String getTitle() { return title; }
 
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(String title) {
+        this.title = title;
+        sendTitleChanged(title);
+    }
 
     public ArrayList<NoticeItem> getChildren() { return children; }
 
@@ -76,6 +89,7 @@ public class NoticeItem implements Parcelable {
     public void changeContent(String content) {
         if(isLeaf()) {
             this.content = content;
+            sendContentChanged(content);
         }
     }
 
@@ -107,5 +121,21 @@ public class NoticeItem implements Parcelable {
         if(this.isLeaf() && item.isLeaf()) return (this.getContent().equals(item.getContent()));
         if(this.isBranch() && item.isBranch()) return (this.getChildren().equals(item.getChildren()));
         return false;
+    }
+
+    public void addNoticeListener(NoticeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeNoticeListener(NoticeListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void sendTitleChanged(String newTitle) {
+        for(NoticeListener listener : listeners) listener.onTitleChanged(newTitle);
+    }
+
+    public void sendContentChanged(String newContent) {
+        for(NoticeListener listener : listeners) listener.onContentChanged(newContent);
     }
 }

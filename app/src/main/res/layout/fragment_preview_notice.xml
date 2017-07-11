@@ -1,0 +1,13 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.noticeditorteam.noticeditorandroid.PreviewNoticeFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <us.feras.mdv.MarkdownView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/markdownView" />
+
+</FrameLayout>

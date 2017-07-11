@@ -20,7 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditNoticeActivity" />
         <activity android:name=".NoticeTreeActivity" />
         <activity
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"
@@ -32,10 +31,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ViewNoticeActivity"
-            android:label="@string/title_activity_view_notice"
-            android:theme="@style/AppTheme"></activity>
+        <activity android:name=".NoticeWorkActivity"></activity>
     </application>
 
 </manifest>

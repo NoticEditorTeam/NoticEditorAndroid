@@ -53,7 +53,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
                 adapter.notifyDataSetChanged();
             }
             else {
-                Intent intent = new Intent(this, EditNoticeActivity.class);
+                Intent intent = new Intent(this, NoticeWorkActivity.class);
                 intent.putExtra("tree", current);
                 intent.putExtra("index", position);
                 startActivityForResult(intent, 1);
