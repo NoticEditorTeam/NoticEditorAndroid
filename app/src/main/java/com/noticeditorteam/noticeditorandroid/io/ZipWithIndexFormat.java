@@ -1,5 +1,7 @@
 package com.noticeditorteam.noticeditorandroid.io;
 
+import android.annotation.SuppressLint;
+
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -42,6 +44,7 @@ public class ZipWithIndexFormat {
         parameters = new ZipParameters();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public NoticeItem importDocument() throws IOException, JSONException, ZipException {
         String indexContent = readFile(INDEX_JSON);
         if (indexContent.isEmpty()) {
@@ -75,13 +78,13 @@ public class ZipWithIndexFormat {
     }
 
     private NoticeItem readNotices(String dir, JSONObject index) throws IOException, JSONException, ZipException {
-        final String title = index.getString(JsonFields.KEY_TITLE);
-        final String filename = index.getString(JsonFields.KEY_FILENAME);
-        final String dirPrefix = index.has(JsonFields.KEY_CHILDREN) ? BRANCH_PREFIX : NOTE_PREFIX;
+        final String title = index.getString(JSONFields.KEY_TITLE);
+        final String filename = index.getString(JSONFields.KEY_FILENAME);
+        final String dirPrefix = index.has(JSONFields.KEY_CHILDREN) ? BRANCH_PREFIX : NOTE_PREFIX;
 
         final String newDir = dir + dirPrefix + filename + "/";
-        if (index.has(JsonFields.KEY_CHILDREN)) {
-            JSONArray children = index.getJSONArray(JsonFields.KEY_CHILDREN);
+        if (index.has(JSONFields.KEY_CHILDREN)) {
+            JSONArray children = index.getJSONArray(JSONFields.KEY_CHILDREN);
             NoticeItem branch = new NoticeItem(title);
             for (int i = 0; i < children.length(); i++) {
                 branch.addChild(readNotices(newDir, children.getJSONObject(i)));
@@ -121,6 +124,7 @@ public class ZipWithIndexFormat {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void writeNoticesAndFillIndex(String dir, NoticeItem item, JSONObject index) throws IOException, JSONException, ZipException {
         final String title = item.getTitle();
         final String dirPrefix = item.isBranch() ? BRANCH_PREFIX : NOTE_PREFIX;
@@ -139,18 +143,18 @@ public class ZipWithIndexFormat {
         }
         paths.add(newDir);
 
-        index.put(JsonFields.KEY_TITLE, title);
-        index.put(JsonFields.KEY_FILENAME, filename);
+        index.put(JSONFields.KEY_TITLE, title);
+        index.put(JSONFields.KEY_FILENAME, filename);
 
         if (item.isBranch()) {
             // ../branch_filename
-            ArrayList list = new ArrayList();
+            ArrayList<JSONObject> list = new ArrayList<>();
             for(NoticeItem child : item.getChildren()) {
                 JSONObject indexEntry = new JSONObject();
                 writeNoticesAndFillIndex(newDir + "/", child, indexEntry);
                 list.add(indexEntry);
             }
-            index.put(JsonFields.KEY_CHILDREN, new JSONArray(list));
+            index.put(JSONFields.KEY_CHILDREN, new JSONArray(list));
         } else {
             // ../note_filename/filename.md
             storeFile(newDir + "/" + filename + ".md", item.getContent());

@@ -15,11 +15,17 @@ public class DocumentFormat {
 
     public static NoticeItem open(File file) throws IOException {
         final boolean isZip = file.getName().toLowerCase().endsWith(".zip");
+        final boolean isJSON = file.getName().toLowerCase().endsWith(".json");
         try {
             if (isZip) {
                 return ZipWithIndexFormat.with(file).importDocument();
             }
-            return JsonFormat.with(file).importDocument();
+            else if(isJSON) {
+                return JSONFormat.with(file).importDocument();
+            }
+            else {
+                return FileImporter.Tree.importFrom(file);
+            }
         } catch (ZipException | IOException | JSONException e){
             return FileImporter.Tree.importFrom(file);
         }

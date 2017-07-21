@@ -153,7 +153,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
     private void showSaveDialog() {
         Intent intent = new Intent(this, FilePickerActivity.class);
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
         intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_NEW_FILE);
         intent.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
         startActivityForResult(intent, SELECT_FILE_REQUEST);
@@ -189,7 +189,14 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
                 try {
                     savepath = data.getData().getPath();
                     NoticeItem root = pathlist.getFirst();
-                    DocumentFormat.save(root, new File(savepath), ExportStrategyHolder.ZIP);
+                    boolean isZip = savepath.toLowerCase().endsWith(".zip");
+                    boolean isJSON = savepath.toLowerCase().endsWith(".json");
+                    if(isZip) {
+                        DocumentFormat.save(root, new File(savepath), ExportStrategyHolder.ZIP);
+                    }
+                    else if(isJSON) {
+                        DocumentFormat.save(root, new File(savepath), ExportStrategyHolder.JSON);
+                    }
                 } catch(Exception e) {
                     e.printStackTrace();
                 }

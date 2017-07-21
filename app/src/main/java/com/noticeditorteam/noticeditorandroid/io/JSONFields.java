@@ -1,6 +1,7 @@
 package com.noticeditorteam.noticeditorandroid.io;
 
-public class JsonFields {
+@SuppressWarnings("unused")
+class JSONFields {
     static final String KEY_TITLE = "title";
     static final String KEY_FILENAME = "filename";
     static final String KEY_STATUS = "status";
