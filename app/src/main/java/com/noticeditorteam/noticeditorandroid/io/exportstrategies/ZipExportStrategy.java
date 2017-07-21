@@ -11,8 +11,9 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.IOException;
 
-public class ZipExportStrategy implements ExportStrategy {
+class ZipExportStrategy implements ExportStrategy {
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public boolean export(File file, NoticeItem tree) throws ExportException {
         try {
@@ -22,5 +23,15 @@ public class ZipExportStrategy implements ExportStrategy {
         } catch (ZipException | IOException | JSONException e) {
             throw new ExportException(e);
         }
+    }
+
+    @Override
+    public String getFormatName() {
+        return "ZIP archive";
+    }
+
+    @Override
+    public String getFileExtension() {
+        return ".zip";
     }
 }

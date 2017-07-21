@@ -16,8 +16,10 @@ import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.noticeditorteam.noticeditorandroid.R;
+import com.noticeditorteam.noticeditorandroid.fragments.FileTypeFragment;
 import com.noticeditorteam.noticeditorandroid.fragments.RenameDialogFragment;
 import com.noticeditorteam.noticeditorandroid.io.DocumentFormat;
+import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategy;
 import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategyHolder;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
@@ -25,7 +27,8 @@ import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-public class NoticeTreeActivity extends AppCompatActivity implements RenameDialogFragment.RenameDialogListener {
+public class NoticeTreeActivity extends AppCompatActivity implements
+        RenameDialogFragment.RenameDialogListener, FileTypeFragment.OnFragmentInteractionListener {
 
     private static final int EDIT_NOTICE_REQUEST = 1;
     private static final int SELECT_FILE_REQUEST = 2;
@@ -44,6 +47,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
     private ArrayAdapter<NoticeItem> adapter;
     private ArrayDeque<NoticeItem> pathlist = new ArrayDeque<>();
     private String path, savepath;
+    private ExportStrategy currentExportStrategy = ExportStrategyHolder.ZIP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +109,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
             case R.id.saveitem:
                 if(path != null) {
                     NoticeItem root = pathlist.getFirst();
-                    DocumentFormat.save(root, new File(path), ExportStrategyHolder.ZIP);
+                    DocumentFormat.save(root, new File(path), currentExportStrategy);
                 }
                 else {
                     showSaveDialog();
@@ -186,20 +190,9 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
                 adapter.notifyDataSetChanged();
                 break;
             case SELECT_FILE_REQUEST:
-                try {
-                    savepath = data.getData().getPath();
-                    NoticeItem root = pathlist.getFirst();
-                    boolean isZip = savepath.toLowerCase().endsWith(".zip");
-                    boolean isJSON = savepath.toLowerCase().endsWith(".json");
-                    if(isZip) {
-                        DocumentFormat.save(root, new File(savepath), ExportStrategyHolder.ZIP);
-                    }
-                    else if(isJSON) {
-                        DocumentFormat.save(root, new File(savepath), ExportStrategyHolder.JSON);
-                    }
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
+                savepath = data.getData().getPath();
+                DialogFragment fragment = FileTypeFragment.newInstance(savepath);
+                fragment.show(getFragmentManager(), "missiles");
                 break;
         }
     }
@@ -222,5 +215,17 @@ public class NoticeTreeActivity extends AppCompatActivity implements RenameDialo
         super.onSaveInstanceState(outState);
         outState.putParcelable(SAVE_TREE, current);
         outState.putString(SAVE_FILE, path);
+    }
+
+    @Override
+    public void onFragmentInteraction(String path, ExportStrategy strategy) {
+        try {
+            savepath = path;
+            NoticeItem root = pathlist.getFirst();
+            DocumentFormat.save(root, new File(savepath), strategy);
+            currentExportStrategy = strategy;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -33,7 +33,7 @@ public class RenameDialogFragment extends DialogFragment {
         try {
             mListener = (RenameDialogListener) context;
         } catch(ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement RenameDialogListener");
+            throw new RuntimeException(context.toString() + " must implement RenameDialogListener");
         }
     }
 

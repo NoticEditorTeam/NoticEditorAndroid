@@ -8,4 +8,6 @@ import java.io.File;
 public interface ExportStrategy {
 
     boolean export(File file, NoticeItem tree) throws ExportException;
+    String getFormatName();
+    String getFileExtension();
 }

@@ -19,4 +19,14 @@ class JSONExportStrategy implements ExportStrategy {
             throw new ExportException(e);
         }
     }
+
+    @Override
+    public String getFormatName() {
+        return "JSON";
+    }
+
+    @Override
+    public String getFileExtension() {
+        return ".json";
+    }
 }
