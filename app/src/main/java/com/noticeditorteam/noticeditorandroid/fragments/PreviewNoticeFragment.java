@@ -55,13 +55,11 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
         if (getArguments() != null) {
             notice = getArguments().getParcelable(ARG_PARAM_TREE);
             assert notice != null;
-            notice.addNoticeListener(this);
+
         }
         if(savedInstanceState != null) {
-            notice.removeNoticeListener(this);
             notice = savedInstanceState.getParcelable(SAVE_PARAM_TREE);
             assert notice != null;
-            notice.addNoticeListener(this);
         }
     }
 
@@ -72,14 +70,15 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
         View view = inflater.inflate(R.layout.fragment_preview_notice, container, false);
         mdView = (MarkdownView) view.findViewById(R.id.markdownView);
         mdView.loadMarkdown(notice.getContent());
+        notice.addNoticeListener(this);
         return view;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(SAVE_PARAM_TREE, notice);
         notice.removeNoticeListener(this);
+        outState.putParcelable(SAVE_PARAM_TREE, notice);
     }
 
     @Override
