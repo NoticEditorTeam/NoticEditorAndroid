@@ -44,6 +44,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     private static final String RESULT_TREE = "tree";
 
     private NoticeItem current;
+    private NoticeItem savingItem;
     private ArrayAdapter<NoticeItem> adapter;
     private ArrayDeque<NoticeItem> pathlist = new ArrayDeque<>();
     private String path, savepath;
@@ -112,11 +113,13 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                     DocumentFormat.save(root, new File(path), currentExportStrategy);
                 }
                 else {
+                    savingItem = pathlist.getFirst();
                     showSaveDialog();
                     path = savepath;
                 }
                 break;
             case R.id.saveasitem:
+                savingItem = pathlist.getFirst();
                 showSaveDialog();
                 break;
         }
@@ -149,6 +152,11 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 current.getChildren().remove(changingItem);
                 adapter.remove(changingItem);
                 adapter.notifyDataSetChanged();
+                break;
+            case R.id.savenoticeitem:
+                savingItem = new NoticeItem("Root");
+                savingItem.addChild(changingItem);
+                showSaveDialog();
                 break;
         }
         return super.onContextItemSelected(item);
@@ -221,8 +229,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     public void onFragmentInteraction(String path, ExportStrategy strategy) {
         try {
             savepath = path;
-            NoticeItem root = pathlist.getFirst();
-            DocumentFormat.save(root, new File(savepath), strategy);
+            DocumentFormat.save(savingItem, new File(savepath), strategy);
             currentExportStrategy = strategy;
         } catch (Exception e) {
             e.printStackTrace();

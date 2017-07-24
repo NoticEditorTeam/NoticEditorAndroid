@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Rename"
+    <item android:title="@string/rename_notice"
         android:id="@+id/renameitem" />
-    <item android:title="Delete"
+    <item android:title="@string/delete_notice"
         android:id="@+id/deletebnoticeitem" />
+    <item android:title="@string/save_notice"
+        android:id="@+id/savenoticeitem" />
 </menu>
