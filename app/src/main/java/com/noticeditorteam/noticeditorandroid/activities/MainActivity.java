@@ -2,7 +2,6 @@ package com.noticeditorteam.noticeditorandroid.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,41 +15,44 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.noticeditorteam.noticeditorandroid.PreferencesRecentFilesService;
 import com.noticeditorteam.noticeditorandroid.R;
+import com.noticeditorteam.noticeditorandroid.RecentFilesService;
 import com.noticeditorteam.noticeditorandroid.io.DocumentFormat;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String RES_RECENT = "recentnotes";
     private static final String SAVE_RECENT = "recentnotes";
+    private static final String CONFIG_RECENT = "RecentFiles";
+
     private static final String ROOT_BRANCH_TITLE = "root";
+
     private static final String ARG_NOTICE = "tree";
     private static final String ARG_FILE = "file";
 
+    private static RecentFilesService filesService;
+
     private int FILE_CODE = 0;
 
-    private static ArrayList<String> recentFiles = new ArrayList<>();
-    private static ArrayAdapter<String> adapter;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-        recentFiles.clear();
-        recentFiles.addAll(preferences.getStringSet(RES_RECENT, new HashSet<>()));
+        filesService = PreferencesRecentFilesService.with(getSharedPreferences(CONFIG_RECENT, MODE_PRIVATE));
         if(savedInstanceState != null) {
-            recentFiles = savedInstanceState.getStringArrayList(SAVE_RECENT);
+            filesService.addAll(savedInstanceState.getStringArrayList(SAVE_RECENT));
         }
+        rebuildRecentFilesList();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ListView list = (ListView) findViewById(R.id.recentview);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recentFiles);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(filesService.getAllFiles()));
         list.setAdapter(adapter);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id)
                 -> openDocument(adapter.getItem(position)));
@@ -95,16 +97,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList(SAVE_RECENT, recentFiles);
+        outState.putStringArrayList(SAVE_RECENT, new ArrayList<>(filesService.getAllFiles()));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        rebuildRecentFilesList();
+        adapter.clear();
+        adapter.addAll(filesService.getAllFiles());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        Set<String> set = new HashSet<>();
-        set.addAll(recentFiles);
-        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
-        editor.putStringSet(RES_RECENT, set);
-        editor.apply();
         super.onDestroy();
     }
 
@@ -112,16 +122,22 @@ public class MainActivity extends AppCompatActivity {
         File notice = new File(path);
         try {
             NoticeItem item = DocumentFormat.open(notice);
-            recentFiles.remove(path);
-            recentFiles.add(path);
-            adapter.remove(path);
-            adapter.add(path);
             Intent intent = new Intent(this, NoticeTreeActivity.class);
             intent.putExtra(ARG_NOTICE, item);
             intent.putExtra(ARG_FILE, path);
+            filesService.addFile(notice.getAbsolutePath());
             startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void rebuildRecentFilesList() {
+        List<String> toRemove = new ArrayList<>();
+        for(String path : filesService.getAllFiles()) {
+            File notice = new File(path);
+            if(!notice.exists()) toRemove.add(path);
+        }
+        filesService.removeAll(toRemove);
     }
 }

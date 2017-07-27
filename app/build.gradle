@@ -36,5 +36,7 @@ dependencies {
     compile 'us.feras.mdv:markdownview:1.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:support-v4:25.3.1'
+    testCompile 'org.mockito:mockito-core:2.7.22'
+    androidTestCompile 'org.mockito:mockito-android:2.7.22'
     testCompile 'junit:junit:4.12'
 }

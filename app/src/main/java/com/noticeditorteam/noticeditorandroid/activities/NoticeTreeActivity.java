@@ -2,6 +2,7 @@ package com.noticeditorteam.noticeditorandroid.activities;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.noticeditorteam.noticeditorandroid.PreferencesRecentFilesService;
 import com.noticeditorteam.noticeditorandroid.R;
+import com.noticeditorteam.noticeditorandroid.RecentFilesService;
 import com.noticeditorteam.noticeditorandroid.fragments.FileTypeFragment;
 import com.noticeditorteam.noticeditorandroid.fragments.RenameDialogFragment;
 import com.noticeditorteam.noticeditorandroid.io.DocumentFormat;
@@ -26,6 +29,8 @@ import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class NoticeTreeActivity extends AppCompatActivity implements
         RenameDialogFragment.RenameDialogListener, FileTypeFragment.OnFragmentInteractionListener {
@@ -42,6 +47,9 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     private static final String SAVE_FILE = "file";
 
     private static final String RESULT_TREE = "tree";
+    private static final String RES_RECENT = "recentnotes";
+
+    private static final String CONFIG_RECENT = "RecentFiles";
 
     private NoticeItem current;
     private NoticeItem savingItem;
@@ -109,8 +117,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 break;
             case R.id.saveitem:
                 if(path != null) {
-                    NoticeItem root = pathlist.getFirst();
-                    DocumentFormat.save(root, new File(path), currentExportStrategy);
+                    exportDocument(pathlist.getFirst(), path, currentExportStrategy);
                 }
                 else {
                     savingItem = pathlist.getFirst();
@@ -124,6 +131,13 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void exportDocument(NoticeItem root, String path, ExportStrategy currentExportStrategy) {
+        DocumentFormat.save(root, new File(path), currentExportStrategy);
+        SharedPreferences preferences = getSharedPreferences(CONFIG_RECENT, MODE_PRIVATE);
+        RecentFilesService service = PreferencesRecentFilesService.with(preferences);
+        service.addFile(path);
     }
 
     @Override
@@ -229,7 +243,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     public void onFragmentInteraction(String path, ExportStrategy strategy) {
         try {
             savepath = path;
-            DocumentFormat.save(savingItem, new File(savepath), strategy);
+            exportDocument(savingItem, savepath, strategy);
             currentExportStrategy = strategy;
         } catch (Exception e) {
             e.printStackTrace();
