@@ -3,9 +3,11 @@ package com.noticeditorteam.noticeditorandroid.activities;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
@@ -146,11 +148,28 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         service.addFile(path);
     }
 
+    private String getRealPathFromURI(Uri uri) {
+        Cursor cursor;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        cursor = getContentResolver().query(uri, proj, null, null, null);
+        if(cursor == null) {
+            return uri.getPath();
+        }
+        else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            String result = cursor.getString(idx);
+            cursor.close();
+            return result;
+        }
+    }
+
     private NoticeItem openDocument(Uri uri) {
-        File notice = new File(uri.getPath());
+        String path = getRealPathFromURI(uri);
+        File notice = new File(path);
         try {
             NoticeItem item = DocumentFormat.open(notice);
-            service.addFile(uri.getPath());
+            service.addFile(path);
             return item;
         } catch (IOException e) {
             e.printStackTrace();
