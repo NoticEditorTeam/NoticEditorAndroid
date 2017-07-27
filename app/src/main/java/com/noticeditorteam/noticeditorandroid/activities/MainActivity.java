@@ -134,10 +134,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void rebuildRecentFilesList() {
         List<String> toRemove = new ArrayList<>();
+        List<String> toAdd = new ArrayList<>();
         for(String path : filesService.getAllFiles()) {
             File notice = new File(path);
+            toAdd.add(path);
             if(!notice.exists()) toRemove.add(path);
         }
+        filesService.addAll(toAdd);
         filesService.removeAll(toRemove);
     }
 }

@@ -3,6 +3,7 @@ package com.noticeditorteam.noticeditorandroid.activities;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import com.noticeditorteam.noticeditorandroid.io.exportstrategies.ExportStrategy
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -57,6 +59,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     private ArrayDeque<NoticeItem> pathlist = new ArrayDeque<>();
     private String path, savepath;
     private ExportStrategy currentExportStrategy = ExportStrategyHolder.ZIP;
+    private RecentFilesService service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +67,14 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_notice_tree);
         current = getIntent().getParcelableExtra(ARG_TREE);
         path = getIntent().getStringExtra(ARG_FILE);
+        service = PreferencesRecentFilesService.with(getSharedPreferences(CONFIG_RECENT, MODE_PRIVATE));
         if(savedInstanceState != null) {
             current = savedInstanceState.getParcelable(SAVE_TREE);
             path = savedInstanceState.getString(SAVE_FILE);
+        }
+        if(current == null) {
+            current = openDocument(getIntent().getData());
+            path = getIntent().getData().getPath();
         }
         if(pathlist.isEmpty()) pathlist.addLast(current);
         ListView list = (ListView) findViewById(R.id.noticeview);
@@ -135,9 +143,19 @@ public class NoticeTreeActivity extends AppCompatActivity implements
 
     private void exportDocument(NoticeItem root, String path, ExportStrategy currentExportStrategy) {
         DocumentFormat.save(root, new File(path), currentExportStrategy);
-        SharedPreferences preferences = getSharedPreferences(CONFIG_RECENT, MODE_PRIVATE);
-        RecentFilesService service = PreferencesRecentFilesService.with(preferences);
         service.addFile(path);
+    }
+
+    private NoticeItem openDocument(Uri uri) {
+        File notice = new File(uri.getPath());
+        try {
+            NoticeItem item = DocumentFormat.open(notice);
+            service.addFile(uri.getPath());
+            return item;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
