@@ -10,7 +10,9 @@ import com.noticeditorteam.noticeditorandroid.NoticeListener;
 import com.noticeditorteam.noticeditorandroid.R;
 import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
 
-import us.feras.mdv.MarkdownView;
+import br.tiagohm.markdownview.MarkdownView;
+import br.tiagohm.markdownview.css.InternalStyleSheet;
+import br.tiagohm.markdownview.css.styles.Github;
 
 
 /**
@@ -69,6 +71,8 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_preview_notice, container, false);
         mdView = (MarkdownView) view.findViewById(R.id.markdownView);
+        InternalStyleSheet mStyle = new Github();
+        mdView.addStyleSheet(mStyle);
         mdView.loadMarkdown(notice.getContent());
         notice.addNoticeListener(this);
         return view;
