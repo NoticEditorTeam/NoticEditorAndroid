@@ -249,9 +249,11 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 adapter.notifyDataSetChanged();
                 break;
             case SELECT_FILE_REQUEST:
-                savepath = data.getData().getPath();
-                DialogFragment fragment = FileTypeFragment.newInstance(savepath);
-                fragment.show(getFragmentManager(), "missiles");
+                if((data != null) && (data.getData() != null)) {
+                    savepath = data.getData().getPath();
+                    DialogFragment fragment = FileTypeFragment.newInstance(savepath);
+                    fragment.show(getFragmentManager(), "missiles");
+                }
                 break;
         }
     }
