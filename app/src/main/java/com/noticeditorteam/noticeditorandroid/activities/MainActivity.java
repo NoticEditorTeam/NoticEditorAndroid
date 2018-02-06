@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         }
         rebuildRecentFilesList();
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        ListView list = (ListView) findViewById(R.id.recentview);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        ListView list = findViewById(R.id.recentview);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(filesService.getAllFiles()));
         list.setAdapter(adapter);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id)
