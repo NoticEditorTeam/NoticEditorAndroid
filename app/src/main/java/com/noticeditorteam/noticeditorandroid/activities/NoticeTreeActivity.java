@@ -11,6 +11,11 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDialogFragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -24,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.noticeditorteam.noticeditorandroid.NoticeTreeAdapter;
 import com.noticeditorteam.noticeditorandroid.PreferencesRecentFilesService;
 import com.noticeditorteam.noticeditorandroid.R;
 import com.noticeditorteam.noticeditorandroid.RecentFilesService;
@@ -63,7 +69,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
 
     private NoticeItem current;
     private NoticeItem savingItem;
-    private ArrayAdapter<NoticeItem> adapter;
+    private NoticeTreeAdapter noticeTreeAdapter;
     private ArrayDeque<NoticeItem> pathlist = new ArrayDeque<>();
     private String path, savepath;
     private ExportStrategy currentExportStrategy = ExportStrategyHolder.ZIP;
@@ -88,25 +94,6 @@ public class NoticeTreeActivity extends AppCompatActivity implements
             path = getIntent().getData().getPath();
         }
         if(pathlist.isEmpty()) pathlist.addLast(current);
-        ListView list = (ListView) findViewById(R.id.noticeview);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(current.getChildren()));
-        list.setAdapter(adapter);
-        list.setLongClickable(true);
-        list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
-            current = adapter.getItem(position);
-            assert current != null;
-            if(current.isBranch()) {
-                pathlist.addLast(current);
-                adapter.clear();
-                adapter.addAll(new ArrayList<>(current.getChildren()));
-                adapter.notifyDataSetChanged();
-            }
-            else {
-                Intent intent = new Intent(this, NoticeWorkActivity.class);
-                intent.putExtra(ARG_TREE, current);
-                startActivityForResult(intent, 1);
-            }
-        };
         FloatingActionButton addNoticeMenu = findViewById(R.id.add_notice_menu);
         addNoticeButton = findViewById(R.id.add_notice_button);
         addBranchButton = findViewById(R.id.add_branch_button);
@@ -122,8 +109,6 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 hideMenu();
             }
         });
-        registerForContextMenu(list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         addNoticeButton.setOnClickListener((View v) -> {
             NoticeItem newNotice = new NoticeItem("New notice", "Enter your notice here");
             current.getChildren().add(newNotice);
@@ -136,6 +121,57 @@ public class NoticeTreeActivity extends AppCompatActivity implements
             noticeTreeAdapter.add(newBranch);
             noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
         });
+        RecyclerView recview = findViewById(R.id.noticeview);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recview.setLayoutManager(mLayoutManager);
+        recview.setItemAnimator(new DefaultItemAnimator());
+        recview.setLongClickable(true);
+        recview.addItemDecoration(new DividerItemDecoration(
+                recview.getContext(),
+                mLayoutManager.getOrientation()
+        ));
+        recview.addOnScrollListener(new OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy != 0 && addNoticeMenu.isShown())
+                    addNoticeMenu.hide();
+                if(dy != 0 && isMenuShown) {
+                    hideMenu();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE){
+                    addNoticeMenu.show();
+                }
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+        NoticeTreeAdapter.OnNoticeClickListener listener = new NoticeTreeAdapter.OnNoticeClickListener() {
+            @Override
+            public void onClick(View v) {
+                NoticeItem currentItem = getCurrentNotice();
+                current = currentItem;
+                if(currentItem.isBranch()) {
+                    pathlist.addLast(currentItem);
+                    noticeTreeAdapter.clear();
+                    noticeTreeAdapter.addAll(currentItem.getChildren());
+                    noticeTreeAdapter.notifyDataSetChanged();
+                }
+                else {
+                    Intent intent = new Intent(getContext(), NoticeWorkActivity.class);
+                    intent.putExtra(ARG_TREE, current);
+                    startActivityForResult(intent, 1);
+                }
+            }
+        };
+        listener.setContext(this);
+        noticeTreeAdapter = new NoticeTreeAdapter(this,
+                new ArrayList<>(current.getChildren()), listener);
+        recview.setAdapter(noticeTreeAdapter);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
@@ -152,14 +188,14 @@ public class NoticeTreeActivity extends AppCompatActivity implements
             case R.id.newbranchitem:
                 NoticeItem newBranch = new NoticeItem("New branch");
                 current.getChildren().add(newBranch);
-                adapter.add(newBranch);
-                adapter.notifyDataSetChanged();
+                noticeTreeAdapter.add(newBranch);
+                noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
                 break;
             case R.id.newnoticeitem:
                 NoticeItem newNotice = new NoticeItem("New notice", "Enter your notice here");
                 current.getChildren().add(newNotice);
-                adapter.add(newNotice);
-                adapter.notifyDataSetChanged();
+                noticeTreeAdapter.add(newNotice);
+                noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
                 break;
             case R.id.saveitem:
                 if(path != null) {
@@ -264,9 +300,9 @@ public class NoticeTreeActivity extends AppCompatActivity implements
             NoticeItem last = pathlist.peekLast();
             if(last.equals(current)) pathlist.removeLast();
             current = pathlist.getLast();
-            adapter.clear();
-            adapter.addAll(new ArrayList<>(current.getChildren()));
-            adapter.notifyDataSetChanged();
+            noticeTreeAdapter.clear();
+            noticeTreeAdapter.addAll(current.getChildren());
+            noticeTreeAdapter.notifyDataSetChanged();
         }
         else finish();
     }
@@ -280,9 +316,8 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 NoticeItem notice = data.getParcelableExtra(RESULT_TREE);
                 int ind = current.getChildren().indexOf(oldcurrent);
                 current.getChildren().set(ind, notice);
-                adapter.clear();
-                adapter.addAll(new ArrayList<>(current.getChildren()));
-                adapter.notifyDataSetChanged();
+                noticeTreeAdapter.set(ind, notice);
+                noticeTreeAdapter.notifyItemChanged(ind);
                 break;
             case SELECT_FILE_REQUEST:
                 if((data != null) && (data.getData() != null)) {
@@ -323,5 +358,45 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void showMenu() {
+        isMenuShown = true;
+        FrameLayout.LayoutParams noticeParams = (FrameLayout.LayoutParams) addNoticeButton.getLayoutParams();
+        noticeParams.rightMargin += (int) (addNoticeButton.getWidth() * 0.25);
+        noticeParams.bottomMargin += (int) (addNoticeButton.getHeight() * 1.7);
+        addNoticeButton.setLayoutParams(noticeParams);
+        addNoticeButton.startAnimation(showNoticeButton);
+        addNoticeButton.setClickable(true);
+        FrameLayout.LayoutParams branchParams = (FrameLayout.LayoutParams) addBranchButton.getLayoutParams();
+        branchParams.rightMargin += (int) (addBranchButton.getWidth() * 0.25);
+        branchParams.bottomMargin += (int) (addBranchButton.getHeight() * 3);
+        addBranchButton.setLayoutParams(branchParams);
+        addBranchButton.startAnimation(showBranchButton);
+        addBranchButton.setClickable(true);
+    }
+
+    private void hideMenu() {
+        isMenuShown = false;
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) addNoticeButton.getLayoutParams();
+        layoutParams.rightMargin -= (int) (addNoticeButton.getWidth() * 0.25);
+        layoutParams.bottomMargin -= (int) (addNoticeButton.getHeight() * 1.7);
+        addNoticeButton.setLayoutParams(layoutParams);
+        addNoticeButton.startAnimation(hideNoticeButton);
+        addNoticeButton.setClickable(false);
+        FrameLayout.LayoutParams branchParams = (FrameLayout.LayoutParams) addBranchButton.getLayoutParams();
+        branchParams.rightMargin -= (int) (addBranchButton.getWidth() * 0.25);
+        branchParams.bottomMargin -= (int) (addBranchButton.getHeight() * 3);
+        addBranchButton.setLayoutParams(branchParams);
+        addBranchButton.startAnimation(hideBranchButton);
+        addBranchButton.setClickable(false);
+    }
+
+    private int fetchSelectionColor() {
+        TypedValue typedValue = new TypedValue();
+        TypedArray a = obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorSelection });
+        int color = a.getColor(0, 0);
+        a.recycle();
+        return color;
     }
 }
