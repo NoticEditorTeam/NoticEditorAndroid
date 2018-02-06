@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="@string/rename_notice"
-        android:id="@+id/renameitem" />
-    <item android:title="@string/delete_notice"
-        android:id="@+id/deletebnoticeitem" />
-    <item android:title="@string/save_notice"
-        android:id="@+id/savenoticeitem" />
+    <item
+        android:id="@+id/renameitem"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="@string/rename_notice"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/deletebnoticeitem"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/delete_notice"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/savenoticeitem"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/save_notice"
+        app:showAsAction="always" />
 </menu>

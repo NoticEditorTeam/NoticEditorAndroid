@@ -2,8 +2,9 @@ package com.noticeditorteam.noticeditorandroid.activities;
 
 import android.app.DialogFragment;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,10 +18,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseBooleanArray;
+import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -29,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.noticeditorteam.noticeditorandroid.MultiChoiceHelper;
 import com.noticeditorteam.noticeditorandroid.NoticeTreeAdapter;
 import com.noticeditorteam.noticeditorandroid.PreferencesRecentFilesService;
 import com.noticeditorteam.noticeditorandroid.R;
@@ -44,8 +51,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class NoticeTreeActivity extends AppCompatActivity implements
         RenameDialogFragment.RenameDialogListener, FileTypeFragment.OnFragmentInteractionListener {
@@ -170,6 +175,103 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         listener.setContext(this);
         noticeTreeAdapter = new NoticeTreeAdapter(this,
                 new ArrayList<>(current.getChildren()), listener);
+        MultiChoiceHelper.MultiChoiceModeListener mListener = new MultiChoiceHelper.MultiChoiceModeListener() {
+            private Menu menu = null;
+
+            @Override
+            public void onItemCheckedStateChanged(android.support.v7.view.ActionMode mode,
+                                                  int position, long id, boolean checked) {
+                NoticeTreeAdapter.ViewHolder itemHolder =
+                        (NoticeTreeAdapter.ViewHolder) recview.findViewHolderForAdapterPosition(position);
+                if(itemHolder != null) {
+                    if(checked) {
+                        itemHolder.getRelativeLayout().setBackgroundColor(fetchSelectionColor());
+                    }
+                    else {
+                        itemHolder.getRelativeLayout().setBackgroundColor(Color.WHITE);
+                    }
+                }
+                if(noticeTreeAdapter.getHelper().getCheckedItemCount() > 1) {
+                    menu.findItem(R.id.renameitem).setVisible(false);
+                    menu.findItem(R.id.savenoticeitem).setVisible(false);
+                }
+                else {
+                    menu.findItem(R.id.renameitem).setVisible(true);
+                    menu.findItem(R.id.savenoticeitem).setVisible(true);
+                }
+            }
+
+            @Override
+            public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.context_menu_bnotice, menu);
+                this.menu = menu;
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+                this.menu = menu;
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
+                int id = item.getItemId();
+                NoticeItem changingItem;
+                SparseBooleanArray positions = noticeTreeAdapter.getHelper().getCheckedItemPositions();
+                switch (id) {
+                    case R.id.renameitem:
+                        Bundle args = new Bundle();
+                        for(int i = positions.size() - 1; i >= 0; --i) {
+                            int key = positions.keyAt(i);
+                            if (positions.get(key)) {
+                                args.putInt(ARG_POSITION, key);
+                                changingItem = noticeTreeAdapter.getItem(key);
+                                assert changingItem != null;
+                                args.putString(ARG_NAME, changingItem.getTitle());
+                                renameDialogFragment.setArguments(args);
+                                noticeTreeAdapter.getHelper().setItemChecked(key, false, true);
+                                if(!renameDialogFragment.isAdded()) {
+                                    renameDialogFragment.show(getSupportFragmentManager(), "missiles");
+                                }
+                            }
+                        }
+                        break;
+                    case R.id.deletebnoticeitem:
+                        for(int i = positions.size() - 1; i >= 0; --i) {
+                            int key = positions.keyAt(i);
+                            if(positions.get(key)) {
+                                changingItem = noticeTreeAdapter.getItem(key);
+                                current.getChildren().remove(changingItem);
+                                noticeTreeAdapter.remove(changingItem);
+                                noticeTreeAdapter.notifyItemRemoved(key);
+                            }
+                        }
+                        noticeTreeAdapter.getHelper().clearChoices();
+                        break;
+                    case R.id.savenoticeitem:
+                        for(int i = positions.size() - 1; i >= 0; --i) {
+                            int key = positions.keyAt(i);
+                            if (positions.get(key)) {
+                                changingItem = noticeTreeAdapter.getItem(key);
+                                savingItem = new NoticeItem("Root");
+                                savingItem.addChild(changingItem);
+                                noticeTreeAdapter.getHelper().setItemChecked(key, false, true);
+                                showSaveDialog();
+                            }
+                        }
+                        break;
+                }
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
+                menu = null;
+            }
+        };
+        noticeTreeAdapter.setModeListener(mListener);
         recview.setAdapter(noticeTreeAdapter);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -189,13 +291,13 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 NoticeItem newBranch = new NoticeItem("New branch");
                 current.getChildren().add(newBranch);
                 noticeTreeAdapter.add(newBranch);
-                noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
+                noticeTreeAdapter.notifyDataSetChanged();
                 break;
             case R.id.newnoticeitem:
                 NoticeItem newNotice = new NoticeItem("New notice", "Enter your notice here");
                 current.getChildren().add(newNotice);
                 noticeTreeAdapter.add(newNotice);
-                noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
+                noticeTreeAdapter.notifyDataSetChanged();
                 break;
             case R.id.saveitem:
                 if(path != null) {
@@ -249,42 +351,6 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        if(v.getId() == R.id.noticeview)
-            getMenuInflater().inflate(R.menu.context_menu_bnotice, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        NoticeItem changingItem = adapter.getItem(info.position);
-        switch (id) {
-            case R.id.renameitem:
-                DialogFragment fragment = new RenameDialogFragment();
-                Bundle args = new Bundle();
-                args.putInt(ARG_POSITION, info.position);
-                assert changingItem != null;
-                args.putString(ARG_NAME, changingItem.getTitle());
-                fragment.setArguments(args);
-                fragment.show(getFragmentManager(), "missiles");
-                break;
-            case R.id.deletebnoticeitem:
-                current.getChildren().remove(changingItem);
-                adapter.remove(changingItem);
-                adapter.notifyDataSetChanged();
-                break;
-            case R.id.savenoticeitem:
-                savingItem = new NoticeItem("Root");
-                savingItem.addChild(changingItem);
-                showSaveDialog();
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
-
     private void showSaveDialog() {
         Intent intent = new Intent(this, FilePickerActivity.class);
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
@@ -332,14 +398,12 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     @Override
     public void onDialogPositiveClick(RenameDialogFragment dialog) {
         Bundle args = dialog.getArguments();
-        NoticeItem renamingItem = adapter.getItem(args.getInt(ARG_POSITION));
-        int ind = current.getChildren().indexOf(renamingItem);
-        assert renamingItem != null;
+        int ind = args.getInt(ARG_POSITION);
+        NoticeItem renamingItem = noticeTreeAdapter.getItem(ind);
         renamingItem.setTitle(dialog.getNoticeName().getText().toString());
         current.getChildren().set(ind, renamingItem);
-        adapter.clear();
-        adapter.addAll(new ArrayList<>(current.getChildren()));
-        adapter.notifyDataSetChanged();
+        noticeTreeAdapter.set(ind, renamingItem);
+        noticeTreeAdapter.notifyItemChanged(ind);
     }
 
     @Override

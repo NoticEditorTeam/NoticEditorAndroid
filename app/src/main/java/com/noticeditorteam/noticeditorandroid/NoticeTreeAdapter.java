@@ -21,11 +21,17 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
     private OnNoticeClickListener onItemClickListener;
     private AppCompatActivity context;
 
+    public MultiChoiceHelper getHelper() {
+        return helper;
+    }
+
+    private MultiChoiceHelper helper;
+
     public AppCompatActivity getContext() {
         return context;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends MultiChoiceHelper.ViewHolder {
         TextView mTextView;
         ImageView mImageView;
         RelativeLayout mRelativeLayout;
@@ -47,6 +53,7 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
         this.context = context;
         notices = noteset;
         onItemClickListener = listener;
+        helper = new MultiChoiceHelper(context, this);
     }
 
     @Override
@@ -69,6 +76,7 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
         }
         holder.mImageView.setImageResource(imageId);
         holder.mImageView.setColorFilter(fetchAccentColor());
+        holder.bind(helper, position);
         holder.setOnClickListener(onItemClickListener);
     }
 
@@ -98,6 +106,10 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
         int color = a.getColor(0, 0);
         a.recycle();
         return color;
+    }
+
+    public void setModeListener(MultiChoiceHelper.MultiChoiceModeListener modeListener) {
+        helper.setMultiChoiceModeListener(modeListener);
     }
 
     @Override
