@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -54,6 +55,8 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     private static final String RES_RECENT = "recentnotes";
 
     private static final String CONFIG_RECENT = "RecentFiles";
+
+    private static final AppCompatDialogFragment renameDialogFragment = new RenameDialogFragment();
 
     private NoticeItem current;
     private NoticeItem savingItem;

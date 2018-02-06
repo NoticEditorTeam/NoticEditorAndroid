@@ -3,7 +3,7 @@ package com.noticeditorteam.noticeditorandroid.fragments;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import com.noticeditorteam.noticeditorandroid.R;
 
-public class RenameDialogFragment extends DialogFragment {
+public class RenameDialogFragment extends AppCompatDialogFragment {
 
     private static final String ARG_NAME = "name";
 
@@ -44,7 +44,7 @@ public class RenameDialogFragment extends DialogFragment {
         Bundle args = getArguments();
         LayoutInflater inflater = getActivity().getLayoutInflater();
         @SuppressLint("InflateParams") View mView = inflater.inflate(R.layout.dialog_rename, null);
-        noticeName = (EditText) mView.findViewById(R.id.newname);
+        noticeName = mView.findViewById(R.id.newname);
         noticeName.setText(args.getString(ARG_NAME));
         builder.setView(mView)
             .setPositiveButton("OK", (dialog, which) -> mListener.onDialogPositiveClick(RenameDialogFragment.this))
