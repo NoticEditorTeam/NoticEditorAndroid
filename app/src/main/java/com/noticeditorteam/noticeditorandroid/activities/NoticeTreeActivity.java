@@ -52,7 +52,6 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     private static final String SAVE_FILE = "file";
 
     private static final String RESULT_TREE = "tree";
-    private static final String RES_RECENT = "recentnotes";
 
     private static final String CONFIG_RECENT = "RecentFiles";
 
