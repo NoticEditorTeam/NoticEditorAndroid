@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.Toolbar;
@@ -15,8 +16,11 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -64,6 +68,9 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     private String path, savepath;
     private ExportStrategy currentExportStrategy = ExportStrategyHolder.ZIP;
     private RecentFilesService service;
+    private boolean isMenuShown = false;
+    private FloatingActionButton addNoticeButton, addBranchButton;
+    private Animation showNoticeButton, hideNoticeButton, showBranchButton, hideBranchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +106,36 @@ public class NoticeTreeActivity extends AppCompatActivity implements
                 intent.putExtra(ARG_TREE, current);
                 startActivityForResult(intent, 1);
             }
+        };
+        FloatingActionButton addNoticeMenu = findViewById(R.id.add_notice_menu);
+        addNoticeButton = findViewById(R.id.add_notice_button);
+        addBranchButton = findViewById(R.id.add_branch_button);
+        showNoticeButton = AnimationUtils.loadAnimation(getApplication(), R.anim.show_notice_button);
+        hideNoticeButton = AnimationUtils.loadAnimation(getApplication(), R.anim.hide_notice_button);
+        showBranchButton = AnimationUtils.loadAnimation(getApplication(), R.anim.show_branch_button);
+        hideBranchButton = AnimationUtils.loadAnimation(getApplication(), R.anim.hide_branch_button);
+        addNoticeMenu.setOnClickListener((View v) -> {
+            if(!isMenuShown) {
+                showMenu();
+            }
+            else {
+                hideMenu();
+            }
         });
         registerForContextMenu(list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        addNoticeButton.setOnClickListener((View v) -> {
+            NoticeItem newNotice = new NoticeItem("New notice", "Enter your notice here");
+            current.getChildren().add(newNotice);
+            noticeTreeAdapter.add(newNotice);
+            noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
+        });
+        addBranchButton.setOnClickListener((View v) -> {
+            NoticeItem newBranch = new NoticeItem("New branch");
+            current.getChildren().add(newBranch);
+            noticeTreeAdapter.add(newBranch);
+            noticeTreeAdapter.notifyItemInserted(noticeTreeAdapter.getItemCount() - 1);
+        });
         setSupportActionBar(toolbar);
     }
 
