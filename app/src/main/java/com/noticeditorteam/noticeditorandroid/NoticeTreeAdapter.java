@@ -18,8 +18,9 @@ import java.util.Collection;
 
 public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.ViewHolder> {
     private ArrayList<NoticeItem> notices;
-    private OnNoticeClickListener onItemClickListener;
     private AppCompatActivity context;
+
+    private static OnNoticeClickListener onItemClickListener;
 
     public MultiChoiceHelper getHelper() {
         return helper;
@@ -27,11 +28,7 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
 
     private MultiChoiceHelper helper;
 
-    public AppCompatActivity getContext() {
-        return context;
-    }
-
-    public static class ViewHolder extends MultiChoiceHelper.ViewHolder {
+    public static class ViewHolder extends MultiChoiceHelper.ViewHolder implements RecyclerView.OnClickListener {
         TextView mTextView;
         ImageView mImageView;
         RelativeLayout mRelativeLayout;
@@ -41,10 +38,16 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
             mImageView = v.findViewById(R.id.image_view);
             mTextView = v.findViewById(R.id.text_view);
             mRelativeLayout = v.findViewById(R.id.view_layout);
+            setOnClickListener(this);
         }
 
         public RelativeLayout getRelativeLayout() {
             return mRelativeLayout;
+        }
+
+        @Override
+        public void onClick(View v) {
+            onItemClickListener.onClick(v, this.getAdapterPosition());
         }
     }
 
@@ -65,7 +68,6 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
 
     @Override
     public void onBindViewHolder(NoticeTreeAdapter.ViewHolder holder, int position) {
-        onItemClickListener.setCurrentNotice(notices.get(position));
         holder.mTextView.setText(notices.get(position).getTitle());
         int imageId;
         if(notices.get(position).isBranch()) {
@@ -77,7 +79,6 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
         holder.mImageView.setImageResource(imageId);
         holder.mImageView.setColorFilter(fetchAccentColor());
         holder.bind(helper, position);
-        holder.setOnClickListener(onItemClickListener);
     }
 
     public void add(NoticeItem notice) {
@@ -117,20 +118,14 @@ public class NoticeTreeAdapter extends RecyclerView.Adapter<NoticeTreeAdapter.Vi
         return notices.size();
     }
 
-    public abstract static class OnNoticeClickListener implements RecyclerView.OnClickListener {
-        private NoticeItem currentNotice;
+    public abstract static class OnNoticeClickListener {
+
         private AppCompatActivity context;
-
-        public void setCurrentNotice(NoticeItem notice) {
-            currentNotice = notice;
-        }
-
-        public NoticeItem getCurrentNotice() {
-            return currentNotice;
-        }
 
         public AppCompatActivity getContext() { return context; }
 
         public void setContext(AppCompatActivity context) { this.context = context; }
+
+        public abstract void onClick(View v, int position);
     }
 }

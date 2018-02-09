@@ -72,6 +72,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
 
     private static final AppCompatDialogFragment renameDialogFragment = new RenameDialogFragment();
 
+    private int currentPosition;
     private NoticeItem current;
     private NoticeItem savingItem;
     private NoticeTreeAdapter noticeTreeAdapter;
@@ -156,16 +157,16 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         });
         NoticeTreeAdapter.OnNoticeClickListener listener = new NoticeTreeAdapter.OnNoticeClickListener() {
             @Override
-            public void onClick(View v) {
-                NoticeItem currentItem = getCurrentNotice();
-                current = currentItem;
-                if(currentItem.isBranch()) {
-                    pathlist.addLast(currentItem);
+            public void onClick(View v, int position) {
+                current = noticeTreeAdapter.getItem(position);
+                if(current.isBranch()) {
+                    pathlist.addLast(current);
                     noticeTreeAdapter.clear();
-                    noticeTreeAdapter.addAll(currentItem.getChildren());
+                    noticeTreeAdapter.addAll(current.getChildren());
                     noticeTreeAdapter.notifyDataSetChanged();
                 }
                 else {
+                    currentPosition = position;
                     Intent intent = new Intent(getContext(), NoticeWorkActivity.class);
                     intent.putExtra(ARG_TREE, current);
                     startActivityForResult(intent, 1);
@@ -377,13 +378,17 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
             case EDIT_NOTICE_REQUEST:
-                NoticeItem oldcurrent = current;
-                current = pathlist.getLast();
-                NoticeItem notice = data.getParcelableExtra(RESULT_TREE);
-                int ind = current.getChildren().indexOf(oldcurrent);
-                current.getChildren().set(ind, notice);
-                noticeTreeAdapter.set(ind, notice);
-                noticeTreeAdapter.notifyItemChanged(ind);
+                if(data != null) {
+                    current = pathlist.getLast();
+                    NoticeItem notice = data.getParcelableExtra(RESULT_TREE);
+                    if(currentPosition > 0) {
+                        int ind = currentPosition;
+                        currentPosition = -1;
+                        current.getChildren().set(ind, notice);
+                        noticeTreeAdapter.set(ind, notice);
+                        noticeTreeAdapter.notifyItemChanged(ind);
+                    }
+                }
                 break;
             case SELECT_FILE_REQUEST:
                 if((data != null) && (data.getData() != null)) {
@@ -398,12 +403,14 @@ public class NoticeTreeActivity extends AppCompatActivity implements
     @Override
     public void onDialogPositiveClick(RenameDialogFragment dialog) {
         Bundle args = dialog.getArguments();
-        int ind = args.getInt(ARG_POSITION);
-        NoticeItem renamingItem = noticeTreeAdapter.getItem(ind);
-        renamingItem.setTitle(dialog.getNoticeName().getText().toString());
-        current.getChildren().set(ind, renamingItem);
-        noticeTreeAdapter.set(ind, renamingItem);
-        noticeTreeAdapter.notifyItemChanged(ind);
+        if(args != null) {
+            int ind = args.getInt(ARG_POSITION);
+            NoticeItem renamingItem = noticeTreeAdapter.getItem(ind);
+            renamingItem.setTitle(dialog.getNoticeName().getText().toString());
+            current.getChildren().set(ind, renamingItem);
+            noticeTreeAdapter.set(ind, renamingItem);
+            noticeTreeAdapter.notifyItemChanged(ind);
+        }
     }
 
     @Override
