@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.noticeditorteam.noticeditorandroid.fragments.PreviewNoticeFragment">
+    tools:noticeActivity="com.noticeditorteam.noticeditorandroid.fragments.PreviewNoticeFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <br.tiagohm.markdownview.MarkdownView

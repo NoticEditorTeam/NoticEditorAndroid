@@ -1,6 +1,7 @@
 package com.noticeditorteam.noticeditorandroid.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,62 +9,43 @@ import android.view.ViewGroup;
 
 import com.noticeditorteam.noticeditorandroid.NoticeListener;
 import com.noticeditorteam.noticeditorandroid.R;
-import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
+import com.noticeditorteam.noticeditorandroid.activities.NoticeWorkActivity;
 
 import br.tiagohm.markdownview.MarkdownView;
 import br.tiagohm.markdownview.css.InternalStyleSheet;
 import br.tiagohm.markdownview.css.styles.Github;
 
 public class PreviewNoticeFragment extends Fragment implements NoticeListener {
-    private static final String ARG_PARAM_TREE = "tree";
-    private static final String SAVE_PARAM_TREE = "tree";
-
-    private static NoticeItem notice;
 
     private MarkdownView mdView;
 
     public PreviewNoticeFragment() {
-        // Required empty public constructor
     }
 
-    public static PreviewNoticeFragment newInstance(NoticeItem notice) {
-        PreviewNoticeFragment fragment = new PreviewNoticeFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM_TREE, notice);
-        fragment.setArguments(args);
-        return fragment;
+    public static PreviewNoticeFragment newInstance() {
+        return new PreviewNoticeFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            notice = getArguments().getParcelable(ARG_PARAM_TREE);
-            assert notice != null;
-        }
-        if(savedInstanceState != null) {
-            notice = savedInstanceState.getParcelable(SAVE_PARAM_TREE);
-            assert notice != null;
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_preview_notice, container, false);
-        mdView = (MarkdownView) view.findViewById(R.id.markdownView);
+        mdView = view.findViewById(R.id.markdownView);
         InternalStyleSheet mStyle = new Github();
         mdView.addStyleSheet(mStyle);
-        mdView.loadMarkdown(notice.getContent());
-        notice.addNoticeListener(this);
+        NoticeWorkActivity noticeActivity = (NoticeWorkActivity) getActivity();
+        assert noticeActivity != null;
+        mdView.loadMarkdown(noticeActivity.getNotice().getContent());
+        noticeActivity.getNotice().addNoticeListener(this);
         return view;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        notice.removeNoticeListener(this);
-        outState.putParcelable(SAVE_PARAM_TREE, notice);
+    public void onDestroy() {
+        NoticeWorkActivity noticeActivity = (NoticeWorkActivity) getActivity();
+        assert noticeActivity != null;
+        noticeActivity.getNotice().removeNoticeListener(this);
+        super.onDestroy();
     }
 
     @Override

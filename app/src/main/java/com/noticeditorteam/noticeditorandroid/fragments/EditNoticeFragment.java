@@ -1,6 +1,7 @@
 package com.noticeditorteam.noticeditorandroid.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,38 +11,25 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.noticeditorteam.noticeditorandroid.R;
-import com.noticeditorteam.noticeditorandroid.model.NoticeItem;
+import com.noticeditorteam.noticeditorandroid.activities.NoticeWorkActivity;
 
 public class EditNoticeFragment extends Fragment {
 
     public EditNoticeFragment() {
     }
 
-    public static EditNoticeFragment newInstance(NoticeItem tree) {
-        EditNoticeFragment fragment = new EditNoticeFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM_TREE, tree);
-        fragment.setArguments(args);
-        return fragment;
+    public static EditNoticeFragment newInstance() {
+        return new EditNoticeFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            notice = getArguments().getParcelable(ARG_PARAM_TREE);
-        }
-        if(savedInstanceState != null) {
-            notice = savedInstanceState.getParcelable(SAVE_PARAM_TREE);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_notice, container, false);
-        EditText editText = (EditText) view.findViewById(R.id.editNotice);
-        editText.setText(notice.getContent());
+        EditText editText = view.findViewById(R.id.editNotice);
+        NoticeWorkActivity noticeActivity = (NoticeWorkActivity) getActivity();
+        assert noticeActivity != null;
+        editText.setText(noticeActivity.getNotice().getContent());
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -53,15 +41,9 @@ public class EditNoticeFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                notice.changeContent(editable.toString());
+                noticeActivity.getNotice().changeContent(editable.toString());
             }
         });
         return view;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(SAVE_PARAM_TREE, notice);
     }
 }

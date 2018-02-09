@@ -20,15 +20,23 @@ public class NoticeWorkActivity extends AppCompatActivity {
     private static final String ARG_TREE = "tree";
     private static final String RESULT_TREE = "tree";
 
+    public NoticeItem getNotice() {
+        return notice;
+    }
+
     private NoticeItem notice;
+    private EditNoticeFragment editFragment;
+    private PreviewNoticeFragment previewFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notice_work);
         notice = getIntent().getParcelableExtra(ARG_TREE);
         if(savedInstanceState != null) notice = savedInstanceState.getParcelable(ARG_TREE);
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        editFragment = EditNoticeFragment.newInstance();
+        previewFragment = PreviewNoticeFragment.newInstance();
+        setContentView(R.layout.activity_notice_work);
+        ViewPager pager = findViewById(R.id.pager);
         PagerAdapter pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
     }
@@ -40,11 +48,11 @@ public class NoticeWorkActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
+    protected void onStop() {
+        super.onStop();
         Intent returnIntent = new Intent(this, NoticeTreeActivity.class);
         returnIntent.putExtra(RESULT_TREE, notice);
         setResult(1, returnIntent);
-        super.onBackPressed();
     }
 
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -55,8 +63,8 @@ public class NoticeWorkActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return position == 0 ? EditNoticeFragment.newInstance(notice)
-                                 : PreviewNoticeFragment.newInstance(notice);
+            return position == 0 ? editFragment
+                                 : previewFragment;
         }
 
         @Override
