@@ -14,19 +14,10 @@ import br.tiagohm.markdownview.MarkdownView;
 import br.tiagohm.markdownview.css.InternalStyleSheet;
 import br.tiagohm.markdownview.css.styles.Github;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PreviewNoticeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PreviewNoticeFragment extends Fragment implements NoticeListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM_TREE = "tree";
     private static final String SAVE_PARAM_TREE = "tree";
 
-    // TODO: Rename and change types of parameters
     private static NoticeItem notice;
 
     private MarkdownView mdView;
@@ -35,14 +26,6 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param notice notice.
-     * @return A new instance of fragment PreviewNoticeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PreviewNoticeFragment newInstance(NoticeItem notice) {
         PreviewNoticeFragment fragment = new PreviewNoticeFragment();
         Bundle args = new Bundle();
@@ -57,7 +40,6 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
         if (getArguments() != null) {
             notice = getArguments().getParcelable(ARG_PARAM_TREE);
             assert notice != null;
-
         }
         if(savedInstanceState != null) {
             notice = savedInstanceState.getParcelable(SAVE_PARAM_TREE);
@@ -68,7 +50,6 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_preview_notice, container, false);
         mdView = (MarkdownView) view.findViewById(R.id.markdownView);
         InternalStyleSheet mStyle = new Github();
