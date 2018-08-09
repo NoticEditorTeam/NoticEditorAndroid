@@ -2,7 +2,6 @@ package com.noticeditorteam.noticeditorandroid;
 
 import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
-import android.test.AndroidTestCase;
 
 import org.junit.After;
 import org.junit.Before;

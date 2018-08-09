@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static com.noticeditorteam.noticeditorandroid.io.JSONFields.KEY_CHILDREN;
 import static com.noticeditorteam.noticeditorandroid.io.JSONFields.KEY_CONTENT;

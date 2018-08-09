@@ -33,8 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class NoticeTreeActivity extends AppCompatActivity implements
         RenameDialogFragment.RenameDialogListener, FileTypeFragment.OnFragmentInteractionListener {
