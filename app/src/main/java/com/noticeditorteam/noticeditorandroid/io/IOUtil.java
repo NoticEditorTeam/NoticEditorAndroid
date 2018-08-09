@@ -76,6 +76,7 @@ public final class IOUtil {
         try {
             newName = URLEncoder.encode(newName, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
         }
         // Allow only english chars, numbers and some specific symbols
         newName = newName.toLowerCase().replaceAll("[^a-z0-9._\\(\\)]", "_");

@@ -91,8 +91,7 @@ public class PreferencesRecentFilesServiceTest {
         when(preferences.getStringSet(anyString(), anySet())).thenReturn(prefsSet);
         when(preferences.edit()).thenReturn(editor);
         when(editor.putStringSet(anyString(), anySet())).thenAnswer(i -> {
-            Set<String> addingSet = i.getArgument(1);
-            prefsSet = addingSet;
+            prefsSet = i.getArgument(1);
             return null;
         });
     }
