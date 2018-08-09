@@ -90,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_CODE && resultCode == Activity.RESULT_OK) {
             Uri uri = data.getData();
-            openDocument(uri.getPath());
+            if(uri != null) {
+                openDocument(uri.getPath());
+            }
         }
     }
 

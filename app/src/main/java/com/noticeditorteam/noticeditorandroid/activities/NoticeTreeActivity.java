@@ -75,7 +75,10 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         }
         if(current == null) {
             current = openDocument(getIntent().getData());
-            path = getIntent().getData().getPath();
+            Uri uri = getIntent().getData();
+            if(uri != null) {
+                path = uri.getPath();
+            }
         }
         if(pathlist.isEmpty()) pathlist.addLast(current);
         ListView list = findViewById(R.id.noticeview);

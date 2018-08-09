@@ -1,6 +1,7 @@
 package com.noticeditorteam.noticeditorandroid.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,7 +67,7 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_preview_notice, container, false);
@@ -79,7 +80,7 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         notice.removeNoticeListener(this);
         outState.putParcelable(SAVE_PARAM_TREE, notice);
