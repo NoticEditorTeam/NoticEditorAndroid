@@ -57,7 +57,7 @@ public class NoticeItem implements Parcelable {
     public NoticeItem(String title, String content) {
         this.title = title;
         this.content = content;
-        children = new ArrayList();
+        children = new ArrayList<>();
         listeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 
