@@ -5,7 +5,11 @@
     <string name="edit_notice">Edit notice</string>
     <string name="new_notice">New notice</string>
     <string name="open_notice">Open notice</string>
-    <string name="save_notice">Save branch/notice</string>
+    <string name="save_branch_notice">Save branch/notice</string>
+    <string name="save_notice">Save notice</string>
+    <string name="save_notice_as">Save notice as…</string>
     <string name="delete_notice">Delete</string>
     <string name="rename_notice">Rename</string>
+    <string name="new_branch">New branch</string>
+
 </resources>

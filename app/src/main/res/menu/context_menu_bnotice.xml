@@ -5,6 +5,6 @@
         android:id="@+id/renameitem" />
     <item android:title="@string/delete_notice"
         android:id="@+id/deletebnoticeitem" />
-    <item android:title="@string/save_notice"
+    <item android:title="@string/save_branch_notice"
         android:id="@+id/savenoticeitem" />
 </menu>
