@@ -112,14 +112,13 @@ public class NoticeItem implements Parcelable {
 
     @Override
     public boolean equals(Object other) {
-        if(other == null) return false;
-        if(!NoticeItem.class.isAssignableFrom(other.getClass())) return false;
+        if (other == null) return false;
+        if (!NoticeItem.class.isAssignableFrom(other.getClass())) return false;
         final NoticeItem item = (NoticeItem) other;
-        if(this.isBranch() && item.isLeaf()) return false;
-        if(this.isLeaf() && item.isBranch()) return false;
-        if(this.isLeaf() && item.isLeaf()) return (this.getContent().equals(item.getContent()));
-        if(this.isBranch() && item.isBranch()) return (this.getChildren().equals(item.getChildren()));
-        return false;
+        if (this.isBranch() && item.isLeaf()) return false;
+        if (this.isLeaf() && item.isBranch()) return false;
+        if (this.isLeaf() && item.isLeaf()) return (this.getContent().equals(item.getContent()));
+        return this.isBranch() && item.isBranch() && (this.getChildren().equals(item.getChildren()));
     }
 
     public void addNoticeListener(NoticeListener listener) {
