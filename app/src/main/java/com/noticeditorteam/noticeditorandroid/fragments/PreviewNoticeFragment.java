@@ -71,7 +71,7 @@ public class PreviewNoticeFragment extends Fragment implements NoticeListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_preview_notice, container, false);
-        mdView = (MarkdownView) view.findViewById(R.id.markdownView);
+        mdView = view.findViewById(R.id.markdownView);
         InternalStyleSheet mStyle = new Github();
         mdView.addStyleSheet(mStyle);
         mdView.loadMarkdown(notice.getContent());

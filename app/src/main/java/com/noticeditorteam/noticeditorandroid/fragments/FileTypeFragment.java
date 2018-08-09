@@ -71,7 +71,7 @@ public class FileTypeFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         @SuppressLint("InflateParams") View mView = inflater.inflate(R.layout.fragment_file_type, null);
-        Spinner mSpinner = (Spinner) mView.findViewById(R.id.spinner);
+        Spinner mSpinner = mView.findViewById(R.id.spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(mView.getContext(),
                 android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

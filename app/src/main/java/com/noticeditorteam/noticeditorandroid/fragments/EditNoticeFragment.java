@@ -63,7 +63,7 @@ public class EditNoticeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_edit_notice, container, false);
-        EditText editText = (EditText) view.findViewById(R.id.editNotice);
+        EditText editText = view.findViewById(R.id.editNotice);
         editText.setText(notice.getContent());
         editText.addTextChangedListener(new TextWatcher() {
             @Override

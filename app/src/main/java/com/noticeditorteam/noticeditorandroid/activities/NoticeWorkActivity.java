@@ -28,7 +28,7 @@ public class NoticeWorkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notice_work);
         notice = getIntent().getParcelableExtra(ARG_TREE);
         if(savedInstanceState != null) notice = savedInstanceState.getParcelable(ARG_TREE);
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        ViewPager pager = findViewById(R.id.pager);
         PagerAdapter pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
     }

@@ -44,7 +44,7 @@ public class RenameDialogFragment extends DialogFragment {
         Bundle args = getArguments();
         LayoutInflater inflater = getActivity().getLayoutInflater();
         @SuppressLint("InflateParams") View mView = inflater.inflate(R.layout.dialog_rename, null);
-        noticeName = (EditText) mView.findViewById(R.id.newname);
+        noticeName = mView.findViewById(R.id.newname);
         noticeName.setText(args.getString(ARG_NAME));
         builder.setView(mView)
             .setPositiveButton("OK", (dialog, which) -> mListener.onDialogPositiveClick(RenameDialogFragment.this))
