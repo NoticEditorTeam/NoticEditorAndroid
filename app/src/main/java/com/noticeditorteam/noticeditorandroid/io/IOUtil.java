@@ -22,6 +22,7 @@ import java.util.List;
 
 import gcardone.junidecode.Junidecode;
 
+@SuppressWarnings("WeakerAccess")
 public final class IOUtil {
 
     private static final int FILENAME_LIMIT = 60;
@@ -43,7 +44,7 @@ public final class IOUtil {
         }
     }
 
-    public static void writeJson(File file, JSONObject json) throws IOException, JSONException {
+    public static void writeJson(File file, JSONObject json) throws IOException {
         try (OutputStream os = new FileOutputStream(file);
              Writer writer = new OutputStreamWriter(os, "UTF-8")) {
             writer.write(json.toString());
@@ -62,6 +63,7 @@ public final class IOUtil {
                 removeDirectoryHelper(f);
             }
         }
+        //noinspection ResultOfMethodCallIgnored
         file.delete();
     }
 
@@ -79,7 +81,7 @@ public final class IOUtil {
             ex.printStackTrace();
         }
         // Allow only english chars, numbers and some specific symbols
-        newName = newName.toLowerCase().replaceAll("[^a-z0-9._\\(\\)]", "_");
+        newName = newName.toLowerCase().replaceAll("[^a-z0-9._()]", "_");
         // Limit filename length
         if (newName.length() > FILENAME_LIMIT) {
             newName = newName.substring(0, FILENAME_LIMIT);

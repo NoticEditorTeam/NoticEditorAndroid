@@ -15,7 +15,7 @@ public class NoticeItem implements Parcelable {
     private String title;
     private String content;
 
-    protected Set<NoticeListener> listeners;
+    private Set<NoticeListener> listeners;
 
     protected NoticeItem(Parcel in) {
         title = in.readString();
@@ -64,6 +64,7 @@ public class NoticeItem implements Parcelable {
         children.add(item);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public boolean isLeaf() {
         return content != null;
     }
@@ -129,11 +130,11 @@ public class NoticeItem implements Parcelable {
         listeners.remove(listener);
     }
 
-    public void sendTitleChanged(String newTitle) {
+    private void sendTitleChanged(String newTitle) {
         for(NoticeListener listener : listeners) listener.onTitleChanged(newTitle);
     }
 
-    public void sendContentChanged(String newContent) {
+    private void sendContentChanged(String newContent) {
         for(NoticeListener listener : listeners) listener.onContentChanged(newContent);
     }
 }
