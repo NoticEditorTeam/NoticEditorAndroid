@@ -69,7 +69,8 @@ public class NoticeTreeActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_notice_tree);
         current = getIntent().getParcelableExtra(ARG_TREE);
         path = getIntent().getStringExtra(ARG_FILE);
-        service = PreferencesRecentFilesService.with(getSharedPreferences(CONFIG_RECENT, MODE_PRIVATE));
+        SharedPreferences preferences = getSharedPreferences(CONFIG_RECENT, MODE_PRIVATE);
+        service = PreferencesRecentFilesService.with(preferences);
         if(savedInstanceState != null) {
             current = savedInstanceState.getParcelable(SAVE_TREE);
             path = savedInstanceState.getString(SAVE_FILE);
@@ -79,8 +80,9 @@ public class NoticeTreeActivity extends AppCompatActivity implements
             path = getIntent().getData().getPath();
         }
         if(pathlist.isEmpty()) pathlist.addLast(current);
-        ListView list = (ListView) findViewById(R.id.noticeview);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(current.getChildren()));
+        ListView list = findViewById(R.id.noticeview);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+                new ArrayList<>(current.getChildren()));
         list.setAdapter(adapter);
         list.setLongClickable(true);
         list.setOnItemClickListener((AdapterView<?> parent, View itemClicked, int position, long id) -> {
@@ -99,7 +101,7 @@ public class NoticeTreeActivity extends AppCompatActivity implements
             }
         });
         registerForContextMenu(list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
